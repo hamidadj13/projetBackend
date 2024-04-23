@@ -1,16 +1,16 @@
-const TaskService  = require('./service');
+const StuffService  = require('./service');
 const { body, param, query, validationResult } = require('express-validator');
 const models = require ('./../../models');
 
-const Task = models.Task;
+const Stuff = models.Stuff;
 const User = models.User;
-const tasksService = new TaskService({ Task, User });
+const stuffsService = new StuffService({ Stuff, User });
 
-function createTask(req, res)
+function createStuff(req, res)
 {
     const paramsValidation = [
         body('userId').notEmpty().withMessage('UserId is required'),
-        body('dueDate').notEmpty().withMessage('Due date is required').isISO8601().withMessage('Due date must be a valid date'),
+        body('price').notEmpty().withMessage('Due date is required').isInt().withMessage('Due date must be a number'),
     ]
 
     Promise.all(paramsValidation.map(validation => validation.run(req)))
@@ -22,7 +22,7 @@ function createTask(req, res)
             });
         }
 
-        const response = await tasksService.createTask(req.body);
+        const response = await stuffsService.createStuff(req.body);
     
         return res.send(response);
 
@@ -36,41 +36,12 @@ function createTask(req, res)
 }
 
 
-function updateTask(req, res)
+function updateStuff(req, res)
 {
     const paramsValidation = [
         param('_id').notEmpty().withMessage('_id is required'),
         body('userId').notEmpty().withMessage('User ID is required.'),
-        body('dueDate').optional().isISO8601().withMessage('DueDate must be a valid date')
-        
-    ]   
-
-    Promise.all(paramsValidation.map(validation => validation.run(req)))
-    .then(async() => {
-        const validationErr = validationResult(req);
-        if (!validationErr.isEmpty()){
-            return res.status(400).send({
-                errors : validationErr.array()
-            });
-        }
-
-        const response = await tasksService.updateTask(req.params._id, req.body);
-    
-        return res.send(response);
-
-    }).catch((err) => {
-        return res.status(500).send({
-            message : 'Utilisateur non retrouvé !!'
-        });
-    });
-
-}
-
-function deleteTask(req, res)
-{
-    const paramsValidation = 
-    [
-        param('_id').notEmpty().withMessage('Task ID is required.')
+        body('price').notEmpty().withMessage('Due date is required').isInt().withMessage('Due date must be a number'),
     ]
 
     Promise.all(paramsValidation.map(validation => validation.run(req)))
@@ -82,7 +53,35 @@ function deleteTask(req, res)
             });
         }
 
-        const response = await tasksService.deleteTask(req.params._id);
+        const response = await stuffsService.updateStuff(req.params._id, req.body);
+    
+        return res.send(response);
+
+    }).catch((err) => {
+        return res.status(500).send({
+            message : 'Stuff not found or something went wrong!!'
+        });
+    });
+
+}
+
+function deleteStuff(req, res)
+{
+    const paramsValidation = 
+    [
+        param('_id').notEmpty().withMessage('Stuff ID is required.')
+    ]
+
+    Promise.all(paramsValidation.map(validation => validation.run(req)))
+    .then(async() => {
+        const validationErr = validationResult(req);
+        if (!validationErr.isEmpty()){
+            return res.status(400).send({
+                errors : validationErr.array()
+            });
+        }
+
+        const response = await stuffsService.deleteStuff(req.params._id);
     
         return res.send(response);
 
@@ -92,7 +91,7 @@ function deleteTask(req, res)
 
 
 module.exports = {
-    createTask,
-    updateTask,
-    deleteTask
+    createStuff,
+    updateStuff,
+    deleteStuff
 }
