@@ -15,7 +15,7 @@ const StuffSchema = new Schema ({
         require: false,
     },
     price: {
-        type: Int,
+        type: Number,
     },
     userId: {
         type: Schema.Types.ObjectId,

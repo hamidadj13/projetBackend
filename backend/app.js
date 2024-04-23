@@ -1,14 +1,25 @@
-var createError = require('http-errors');
-var express = require('express');
-var logger = require('morgan');
+const config      = require('./config.js');
+const createError = require('http-errors');
+const express     = require('express');
+const logger      = require('morgan');
+const users       = require('./app/users');
+const stuffs       = require('./app/stuffs');
 
-
-var app = express();
+const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+
+console.log(`API is running on a ${config.NODE_ENV} environment.`)
+app.get('/', function (req, res){
+    res.json({
+        message: 'It works very well !!'
+    });
+});
+
+app.use('/', [users], [stuffs]);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -16,14 +27,14 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res) {
+  let errorMessage = {};
+  errorMessage.message = err.message;
+  errorMessage.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+  errorMessage.status = err.status || 500;
+
+  res.status(errorMessage.status).json(errorMessage);
+}); 
 
 module.exports = app;
