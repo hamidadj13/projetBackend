@@ -59,7 +59,7 @@ function updateUser(req, res)
 
     }).catch((err) => {
         return res.status(500).send({
-            message : 'Utilisateur non retrouvé !!'
+            message : 'User not found !!'
         });
     });
 
