@@ -117,11 +117,40 @@ async function listAllUsers(req, res)
 
 }
 
+function login(req, res)
+{
+    const paramsValidation = [
+        body('email').notEmpty().withMessage('Email is required.'),
+        body('password').notEmpty().withMessage('Password is required.'),
+    ]
+    Promise.all(paramsValidation.map(validation => validation.run(req)))
+    .then(async() => {
+        const validationErr = validationResult(req);
+        if (!validationErr.isEmpty()){
+            return res.status(400).send({
+                errors : validationErr.array()
+            });
+        }
+
+        const response = await usersService.login(req.body);
+        
+        return res.send(response);
+
+    }).catch((err) => {
+        return res.status(500).send({
+            message : 'Something is wrong !!'
+        });
+    });
+
+    
+}
+
 
 module.exports = 
 {
     createUser,
     updateUser,
     deleteUser, 
-    listAllUsers
+    listAllUsers,
+    login
 };

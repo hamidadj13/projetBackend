@@ -90,6 +90,40 @@ class UsersService
             limit: limit
         };
     }
+
+    async login(userData) 
+    {
+        const _user = await this.User.findOne({
+            email: userData.email
+            
+        });
+
+        if(_user)
+        {
+            let isPasswordValid  = _user.comparePassword(userData.password);
+            
+
+            if (isPasswordValid) {
+                return{
+                    message : 'User is connected'
+                };
+            }
+            else 
+            {
+                return{
+                    message : 'User credentials are not valid'
+                };
+            }
+        } 
+        else 
+        {
+            return{
+                message : 'THERE IS NO USER WITH THE EMAIL'
+            };
+        }
+        
+        
+    }
 }
 
 module.exports = UsersService;

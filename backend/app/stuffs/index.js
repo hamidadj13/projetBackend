@@ -10,4 +10,6 @@ router.put('/stuff/:_id', stuffsController.updateStuff);
 
 router.delete('/stuff/:_id', stuffsController.deleteStuff);
 
+router.get('/stuffs/', stuffsController.listAllStuffs);
+
 module.exports = router; 

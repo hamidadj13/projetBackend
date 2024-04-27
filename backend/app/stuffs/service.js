@@ -29,7 +29,7 @@ class StuffService
         await _user.save(); // On enregistre
 
         return{
-            message: 'sSuff created successfully !!',
+            message: 'Stuff created successfully !!',
             stuff: _stuff
         };
         
@@ -37,7 +37,7 @@ class StuffService
 
     async updateStuff(stuffId, stuffData) 
     {
-        const _stuff = await this.stuff.findByIdAndUpdate(stuffId, stuffData, {new: true});
+        const _stuff = await this.Stuff.findByIdAndUpdate(stuffId, stuffData, {new: true});
 
         if(_stuff)
         {
@@ -63,7 +63,6 @@ class StuffService
             if(_user)
             {
                 _user.stuffs.pull(stuffId);
-               
             } 
     
             return{
@@ -74,6 +73,35 @@ class StuffService
         return {
             message: 'stuff not found!!'
         };       
+    }
+
+    async listAllStuffs({page = 1, limit = 10, search = ''}) 
+    {
+        let query = {};
+
+        if (search) {
+            query = {
+                $or:[
+                    {title: { $regex: search, $options: '1' } },
+                    {description: { $regex: search, $options: '1' } },
+                    {role: { $regex: search, $options: '1' } }
+                ],
+            };
+        };
+        const _stuffs = await this.Stuff.find(query)
+                                       .limit(limit)
+                                       .skip((page - 1) * limit);
+
+        const _total = await this.Stuff.countDocuments();
+
+        return {
+            message : 'List of all stuffs !!',
+            stuffs: _stuffs,
+            total: _total,
+            totalPages: Math.ceil(_total / limit),
+            currentPage: page,
+            limit: limit
+        };
     }
 }
 

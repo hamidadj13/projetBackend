@@ -10,7 +10,7 @@ function createStuff(req, res)
 {
     const paramsValidation = [
         body('userId').notEmpty().withMessage('UserId is required'),
-        body('price').notEmpty().withMessage('Due date is required').isInt().withMessage('Due date must be a number'),
+        body('price').notEmpty().withMessage('Price is required').isInt().withMessage('Price must be a number'),
     ]
 
     Promise.all(paramsValidation.map(validation => validation.run(req)))
@@ -89,9 +89,38 @@ function deleteStuff(req, res)
 
 }
 
+async function listAllStuffs(req, res)
+{
+    const paramsValidation = [
+        query('page').optional().isInt().withMessage("Page must be an integer"),
+        query('limit').optional().isInt().withMessage("Limit must be an integer"),
+    ]   
+
+    Promise.all(paramsValidation.map(validation => validation.run(req)))
+    .then(async() => {
+        const validationErr = validationResult(req);
+        if (!validationErr.isEmpty()){
+            return res.status(400).send({
+                errors : validationErr.array()
+            });
+        }
+
+        const response = await stuffsService.listAllStuffs(req.query);
+
+        return res.send(response);
+
+    }).catch((err) => {
+        return res.status(500).send({
+            message : 'Something went wrong!!'
+        });
+    });  
+
+}
+
 
 module.exports = {
     createStuff,
     updateStuff,
-    deleteStuff
+    deleteStuff,
+    listAllStuffs
 }

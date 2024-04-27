@@ -12,4 +12,6 @@ router.delete('/user/:_id', usersController.deleteUser);
 
 router.get('/users', usersController.listAllUsers);
 
+router.post('/login', usersController.login);
+
 module.exports = router;
